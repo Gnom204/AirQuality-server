@@ -1,11 +1,30 @@
 const Location = require("../models/Location");
 const upload = require("../config/multer");
-
+const fs = require("fs");
+const path = require("path");
 const uploadImage = upload.single("image");
 
 const addData = async (req, res) => {
   const { name, temperature, humidity, sound, dust, gas } = req.body;
-  console.log(req.body);
+  try {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      method: req.method,
+      url: req.url,
+      body: req.body,
+      ip: req.ip,
+    };
+
+    await fs.promises.appendFile(
+      path.join(__dirname, "requests.log"),
+      JSON.stringify(logEntry) + "\n"
+    );
+
+    next();
+  } catch (err) {
+    console.error("Ошибка записи лога:", err);
+    next();
+  }
   try {
     // Поиск существующей локации
     const existingLocation = await Location.findOne({ name });
