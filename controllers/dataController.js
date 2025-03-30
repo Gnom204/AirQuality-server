@@ -4,55 +4,21 @@ const upload = require("../config/multer");
 const uploadImage = upload.single("image");
 
 const addData = async (req, res) => {
+  const { name, temperature, humidity, sound, dust, gas } = req.body;
   try {
-    // Парсинг параметров из URL
-    const paramsString = decodeURIComponent(req.params.params);
-    const params = new URLSearchParams(paramsString);
-
-    // Валидация
-    const name = params.get("name");
-    if (!name) return res.status(400).json({ error: "Name is required" });
-
-    // Подготовка данных для обновления
-    const update = { $push: {} };
-    const fields = ["temperature", "humidity", "sound", "dust", "gas"];
-
-    fields.forEach((field) => {
-      const value = params.get(field);
-      if (value && !isNaN(value)) {
-        update.$push[field] = parseFloat(value);
-      }
+    const location = new Location({
+      name,
+      temperature,
+      humidity,
+      sound,
+      dust,
+      gas,
     });
-
-    // Проверка наличия данных
-    if (Object.keys(update.$push).length === 0) {
-      return res.status(400).json({ error: "No valid data provided" });
-    }
-
-    // Обновление или создание записи
-    const result = await Location.findOneAndUpdate({ name }, update, {
-      upsert: true,
-      new: true,
-      runValidators: true,
-    });
-
-    res.json({
-      [result.name]: {
-        temperature: result.temperature,
-        humidity: result.humidity,
-        sound: result.sound,
-        dust: result.dust,
-        gas: result.gas,
-      },
-    });
+    await location.save();
+    res.json(location);
   } catch (err) {
-    if (err.name === "ValidationError") {
-      return res.status(400).json({ error: err.message });
-    }
-    if (err.code === 11000) {
-      return res.status(400).json({ error: "Location already exists" });
-    }
-    res.status(500).json({ error: "Server error" });
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 const updateLocation = async (req, res) => {
