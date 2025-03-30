@@ -5,7 +5,7 @@ const uploadImage = upload.single("image");
 
 const addData = async (req, res) => {
   const { name, temperature, humidity, sound, dust, gas } = req.body;
-
+  console.log(req.body);
   try {
     // Поиск существующей локации
     const existingLocation = await Location.findOne({ name });
