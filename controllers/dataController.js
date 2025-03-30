@@ -63,15 +63,16 @@ const updateLocation = async (req, res) => {
       ...req.body,
       image: req.file ? `/uploads/${req.file.filename}` : undefined,
     };
-
+    console.log(updateData);
     const location = await Location.findOneAndUpdate(
       { name: req.body.name },
       { $set: updateData },
       { new: true }
     );
-
+    console.log(location);
     res.json(location);
   } catch (err) {
+    console.log(err);
     console.error("Ошибка обновления:", err);
     res.status(500).json({ message: "Ошибка сервера" });
   }
