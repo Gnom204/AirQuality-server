@@ -1,0 +1,11 @@
+{"timestamp":"2025-03-30T12:46:02.048Z","method":"POST","url":"/name=%D0%92%D0%BD%D1%83%D0%BA%D0%BE%D0%B2%D0%BE&temperature=25.2&humidity=43.0&sound=504.6&dust=0.034&gas=8.9","body":{},"ip":"::1"}
+{"timestamp":"2025-03-30T12:53:42.933Z","method":"POST","url":"/name=%D0%92%D0%BD%D1%83%D0%BA%D0%BE%D0%B2%D0%BE&temperature=25.2&humidity=43.0&sound=504.6&dust=0.034&gas=8.9","body":{},"ip":"::1"}
+{"timestamp":"2025-03-30T12:56:09.512Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T12:56:12.934Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T12:56:14.427Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T12:56:16.405Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T12:59:46.557Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T12:59:49.045Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T13:07:29.919Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T13:08:41.099Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}
+{"timestamp":"2025-03-30T13:09:16.716Z","method":"POST","url":"/","body":{"name":"Внуоковр","temperature":25.2,"humidity":43,"sound":504.6,"dust":0.034,"gas":8.9},"ip":"::1"}

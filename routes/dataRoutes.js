@@ -14,7 +14,7 @@ const { makeAdmin } = require("../controllers/adminController");
 const auth = require("../middlewares/auth");
 const admin = require("../middlewares/admin");
 
-router.post("/:params", addData);
+router.post("/", addData);
 router.put("/location", auth, admin, uploadImage, updateLocation);
 router.patch("/make-admin/:id", auth, admin, makeAdmin);
 router.get("/", getLocations);

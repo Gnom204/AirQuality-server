@@ -5,8 +5,8 @@ const path = require("path");
 const uploadImage = upload.single("image");
 
 const addData = async (req, res) => {
-  const { name, temperature, humidity, sound, dust, gas } = req.body;
   try {
+    // Логирование запроса
     const logEntry = {
       timestamp: new Date().toISOString(),
       method: req.method,
@@ -20,48 +20,91 @@ const addData = async (req, res) => {
       JSON.stringify(logEntry) + "\n"
     );
 
-    next();
-  } catch (err) {
-    console.error("Ошибка записи лога:", err);
-    next();
-  }
-  try {
-    // Поиск существующей локации
+    // Валидация входящих данных
+    const { name, temperature, humidity, sound, dust, gas } = req.body;
+
+    if (!name || typeof name !== "string") {
+      return res.status(400).json({ message: "Valid name is required" });
+    }
+
+    // Подготовка данных для обновления
+    const updates = {};
+    const sensors = [
+      { field: "temperature", value: temperature },
+      { field: "humidity", value: humidity },
+      { field: "sound", value: sound },
+      { field: "dust", value: dust },
+      { field: "gas", value: gas },
+    ];
+
+    // Формируем объект для $push
+    sensors.forEach(({ field, value }) => {
+      if (typeof value === "number" && !isNaN(value)) {
+        updates[field] = value;
+      }
+    });
+
+    // Поиск существующей записи
     const existingLocation = await Location.findOne({ name });
 
     if (existingLocation) {
-      // Обновление существующей записи
+      // Создаем объект для $push операций
+      const pushOperations = {};
+      Object.entries(updates).forEach(([field, value]) => {
+        pushOperations[field] = value;
+      });
+
+      // Обновляем только сенсорные данные
       const updatedLocation = await Location.findOneAndUpdate(
         { name },
+        { $push: pushOperations },
         {
-          $push: {
-            temperature: temperature,
-            humidity: humidity,
-            sound: sound,
-            dust: dust,
-            gas: gas,
-          },
-        },
-        { new: true } // Возвращает обновленный документ
+          new: true,
+          runValidators: true,
+          select: "-usersRated -starsRatings -description -image", // Исключаем не изменяемые поля
+        }
       );
+
       return res.json(updatedLocation);
     }
 
-    // Создание новой записи
-    const location = new Location({
+    // Создание новой записи с учетом схемы по умолчанию
+    const newLocationData = {
       name,
-      temperature: [temperature],
-      humidity: [humidity],
-      sound: [sound],
-      dust: [dust],
-      gas: [gas],
-    });
+      ...Object.fromEntries(
+        sensors
+          .filter(({ value }) => typeof value === "number" && !isNaN(value))
+          .map(({ field, value }) => [field, [value]])
+      ),
+    };
 
+    const location = new Location(newLocationData);
     await location.save();
-    res.json(location);
+
+    return res.status(201).json(
+      location.toObject({
+        transform: (doc, ret) => {
+          delete ret.usersRated;
+          delete ret.starsRatings;
+          return ret;
+        },
+      })
+    );
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error processing request:", err);
+
+    const statusCode = err.name === "ValidationError" ? 400 : 500;
+    const message =
+      statusCode === 400
+        ? `Validation error: ${err.message}`
+        : "Internal server error";
+
+    const response = {
+      message,
+      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    };
+
+    return res.status(statusCode).json(response);
   }
 };
 const updateLocation = async (req, res) => {
