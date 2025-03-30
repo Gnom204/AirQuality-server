@@ -5,19 +5,43 @@ const uploadImage = upload.single("image");
 
 const addData = async (req, res) => {
   const { name, temperature, humidity, sound, dust, gas } = req.body;
+
   try {
+    // Поиск существующей локации
+    const existingLocation = await Location.findOne({ name });
+
+    if (existingLocation) {
+      // Обновление существующей записи
+      const updatedLocation = await Location.findOneAndUpdate(
+        { name },
+        {
+          $push: {
+            temperature: temperature,
+            humidity: humidity,
+            sound: sound,
+            dust: dust,
+            gas: gas,
+          },
+        },
+        { new: true } // Возвращает обновленный документ
+      );
+      return res.json(updatedLocation);
+    }
+
+    // Создание новой записи
     const location = new Location({
       name,
-      temperature,
-      humidity,
-      sound,
-      dust,
-      gas,
+      temperature: [temperature],
+      humidity: [humidity],
+      sound: [sound],
+      dust: [dust],
+      gas: [gas],
     });
+
     await location.save();
     res.json(location);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
