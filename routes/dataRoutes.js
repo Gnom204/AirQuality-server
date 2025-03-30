@@ -8,6 +8,7 @@ const {
   getLocation,
   starsRate,
   updateDescription,
+  deleteLocation,
 } = require("../controllers/dataController");
 const { makeAdmin } = require("../controllers/adminController");
 const auth = require("../middlewares/auth");
@@ -19,6 +20,7 @@ router.patch("/make-admin/:id", auth, admin, makeAdmin);
 router.get("/", getLocations);
 router.post("/rate/", auth, starsRate);
 router.get("/location/:id", getLocation);
+router.delete("/location/:id", auth, admin, deleteLocation);
 router.put("/description", auth, admin, updateDescription);
 
 module.exports = router;

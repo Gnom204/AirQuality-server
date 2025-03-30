@@ -138,6 +138,18 @@ const starsRate = async (req, res) => {
   }
 };
 
+const deleteLocation = async (req, res) => {
+  try {
+    const location = await Location.findByIdAndDelete(req.params.id);
+    if (!location) {
+      return res.status(404).json({ message: "Location not found" });
+    }
+    res.json({ message: "Location deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   uploadImage,
   addData,
@@ -145,5 +157,6 @@ module.exports = {
   getLocations,
   getLocation,
   starsRate,
+  deleteLocation,
   updateDescription,
 };
