@@ -4,6 +4,15 @@ const fs = require("fs");
 const path = require("path");
 const uploadImage = upload.single("image");
 
+/**
+ * Processes incoming data from sensors and updates or creates a new location
+ * in the database accordingly.
+ *
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ *
+ * @returns {Promise<Object>} - The response object
+ */
 const addData = async (req, res) => {
   try {
     // Логирование запроса
@@ -20,7 +29,6 @@ const addData = async (req, res) => {
       JSON.stringify(logEntry) + "\n"
     );
 
-    // Валидация входящих данных
     const { name, temperature, humidity, sound, dust, gas } = req.body;
 
     if (!name || typeof name !== "string") {
@@ -37,7 +45,6 @@ const addData = async (req, res) => {
       { field: "gas", value: gas },
     ];
 
-    // Формируем объект для $push
     sensors.forEach(({ field, value }) => {
       if (typeof value === "number" && !isNaN(value)) {
         updates[field] = value;
@@ -48,13 +55,11 @@ const addData = async (req, res) => {
     const existingLocation = await Location.findOne({ name });
 
     if (existingLocation) {
-      // Создаем объект для $push операций
       const pushOperations = {};
       Object.entries(updates).forEach(([field, value]) => {
         pushOperations[field] = value;
       });
 
-      // Обновляем только сенсорные данные
       const updatedLocation = await Location.findOneAndUpdate(
         { name },
         { $push: pushOperations },
@@ -68,7 +73,6 @@ const addData = async (req, res) => {
       return res.json(updatedLocation);
     }
 
-    // Создание новой записи с учетом схемы по умолчанию
     const newLocationData = {
       name,
       ...Object.fromEntries(
@@ -107,10 +111,20 @@ const addData = async (req, res) => {
     return res.status(statusCode).json(response);
   }
 };
+/**
+ * Обновляет локацию
+ * @async
+ * @function
+ * @param {Object} req - Объект запроса
+ * @param {Object} res - Объект ответа
+ * @param {string} req.body.name - Имя локации
+ * @param {File} [req.file] - Изображение локации
+ * @returns {Promise<Object>} - Объект с данными обновленной локации
+ */
+
 const updateLocation = async (req, res) => {
   console.log("hype");
   try {
-    // Предполагается, что используется multer с именем поля 'image'
     const updateData = {
       ...req.body,
       image: req.file ? `/uploads/${req.file.filename}` : undefined,
@@ -130,6 +144,14 @@ const updateLocation = async (req, res) => {
   }
 };
 
+/**
+ * Получает список локаций
+ * @async
+ * @function
+ * @param {Object} req - Объект запроса
+ * @param {Object} res - Объект ответа
+ * @returns {Promise<Array<Object>>} - Массив объектов с данными локаций
+ */
 const getLocations = async (req, res) => {
   try {
     const locations = await Location.find().sort({ createdAt: -1 });
@@ -139,6 +161,16 @@ const getLocations = async (req, res) => {
   }
 };
 
+/**
+ * Обновляет описание локации
+ * @async
+ * @function
+ * @param {Object} req - Объект запроса
+ * @param {Object} res - Объект ответа
+ * @param {string} req.body.name - Имя локации
+ * @param {string} req.body.description - Новое описание локации
+ * @returns {Promise<Object>} - Объект с данными обновленной локации
+ */
 const updateDescription = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -153,6 +185,15 @@ const updateDescription = async (req, res) => {
   }
 };
 
+/**
+ * Получает локацию по ID
+ * @async
+ * @function
+ * @param {Object} req - Объект запроса
+ * @param {Object} res - Объект ответа
+ * @param {string} req.params.id - ID локации
+ * @returns {Promise<Object>} - Объект с данными локации
+ */
 const getLocation = async (req, res) => {
   try {
     const location = await Location.findById(req.params.id);
@@ -165,6 +206,16 @@ const getLocation = async (req, res) => {
   }
 };
 
+/**
+ * Оценивает локацию
+ * @async
+ * @function
+ * @param {Object} req - Объект запроса
+ * @param {Object} res - Объект ответа
+ * @param {string} req.body.name - Имя локации
+ * @param {number} req.body.stars - Оценка
+ * @returns {Promise<Object>} - Объект с данными обновленной локации
+ */
 const starsRate = async (req, res) => {
   try {
     const { name, stars } = req.body;
@@ -189,6 +240,16 @@ const starsRate = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+/**
+ * Deletes a location by its ID.
+ * @async
+ * @function
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {string} req.params.id - The ID of the location to delete.
+ * @returns {Promise<void>} - Returns a response indicating success or failure.
+ */
 
 const deleteLocation = async (req, res) => {
   try {
